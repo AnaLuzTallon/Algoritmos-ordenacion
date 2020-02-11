@@ -1,14 +1,117 @@
-#include <iostream> 
+/* 
+//@filename mergesort.cpp
+//@author  Ángel Álvarez, AnaLuz Tallón 
+//@date 2020-02-11
+//
+//@brief	Programa realizado para explicar el funcionamiento del algoritmo de ordenación MERGESORT
+*/
+
+//Declaración de Librerias a utilizar
+
+#include <iostream>
+
+#include <iomanip>
+#define DEFAULT "\033[1;0m"
+#define RED "\033[1;31m"
+#define GREEN "\033[1;32m"
+#define BLUE "\033[1;34m"
+#define PURPLE "\033[1;35m"
+
+
+
 using namespace std; 
 
 
-void imprimeVectorEnteros( const int vector[], int util_vector){
-	cout << "( "; 	
-	for ( int i = 0; i < util_vector; i += 1)
-	{
-		cout << vector[i] << " "; 
+/**
+ * @brief	Módulo que imprime por pantalla el vector de enteros indicado.
+ * @pre		vector[] debe ser un vector de tipo entero.
+ * @pre		util_vector debe ser menor que la DIMENSION total de vector.
+ * @param	int vector[](E) Referecia a un vector de tipo entero. Se pasa con el modificador CONST puesto que no se va a modificar.
+ * @param	int util_vector Variable que indica el número de elementos ocupados en vector y la siguiente posición disponible para la inserción. Se pasa por COPIA puesto que no se va a modificar vector.
+ * @post	Los elementos del vector saldrán impresos por pantalla. NO SE INSERTA SALTO DE LÍNEA AL FINAL DEL PROCEDIMIENTO.
+ EJEMPLO  --> 1 2 3 4 5
+**/
+ 
+void imprimeVectorEnteros(const int vector[], int util_vector) {
+	for(int i = 0; i < util_vector; i++) {
+		cout << vector[i] << " ";
 	}
-	cout << ")"; 
+}
+
+/**
+ * @brief	Módulo que filtra datos y devuelve un número entero.
+ * @return 	Devuelve un número entero
+**/
+int introduceEntero() {
+	// Declaración del vector de caracteres que usaremos como entrada
+	const int DIM_ENTRADA = 10;
+	char entrada[DIM_ENTRADA] = "";
+	
+	// Variable donde se va a almacenar el entero de salida
+	int numero;
+	// Variables auxiliares para el filtro de datos
+	bool esEntero;
+	bool negativo;
+	
+	do {
+		// Reiniciamos los valores para el filtrado
+		esEntero = true;
+		negativo = false;
+		numero = 0;
+		// Entrada a la cadena de caracteres
+		cin >> entrada;
+		for(int i = 0; (entrada[i] != '\0') && esEntero ; i++) {
+			// Condición para el número negativo
+			if ((i == 0) && (entrada[i] == 45)) {
+				negativo = true;
+			}
+			else if ((entrada[i] >= 48) && (entrada[i] <= 57)) {
+				numero *= 10;
+				if (negativo) {
+					numero -= (entrada[i] - 48);
+				}
+				else {
+					numero += (entrada[i] - 48);
+				}
+			}
+			else {
+				esEntero = false;
+			}
+		}
+
+		if (!esEntero) {
+			cout << RED << "El valor introducido no es un número entero." << DEFAULT << endl;
+			cout << "Introduzca un valor entero: ";
+		}
+	} while (!esEntero);
+	
+	return numero;
+}
+	 
+/**
+ * @brief	Módulo que permite la introducción de valores en un vector de tipo entero. Este módulo borrará los valores que haya anteriormente introducidos.
+ * @param 	int vector[](S) Referencia a un vector de tipo INT al cual vamos a introducir valores. Se pasa SIN el modificador CONST puesto que vamos a modificarlo.
+ * @param	int util_vector(S) Variable que indica cuantos elementos de vector estan ocupados y cual es la siguiente posición libre para la escritura. Se pasa por REFERENCIA puesto que se va a modificar el vector.
+ * @param 	int DIM_VECTOR(E) Variable que indica la dimensión total del vector. Es una variable CONST, no se puede modificar. Se usará como filtro.
+ * @post 	vector[] Contendrá valores de tipo INT.
+ * @post	util_vector será <= DIM_VECTOR
+**/
+void introduceVectorEnteros(int vector[], int &util_vector, const int DIM_VECTOR) {
+
+	do {
+		cout << "¿Cuantos valores desea introducir al vector? : ";
+		util_vector = introduceEntero();
+		if ((util_vector < 0) || (util_vector > DIM_VECTOR)) {
+			cout << RED << "El valor introducido debe ser un número entero mayor o igual que 0 y menor o igual que " << DIM_VECTOR << DEFAULT << endl;
+		}
+
+	} while ((util_vector < 0) || (util_vector > DIM_VECTOR));
+	
+	
+	for (int i = 0; i < util_vector; i++) {
+		cout << "Introduzca el valor que se guardará en la posición " << i << " del vector: ";
+		vector[i] = introduceEntero();
+	}
 }
 
 /*
@@ -52,8 +155,7 @@ void  ordena_ordenados(const int vector_izq[], int util_vector_izq, const int ve
 
 }
 
-/*
- *  @brief Este módulo ordena un vector de ENTEROS de menor a menor utilizando un algoritmo basado en el método merge. 
+/**  @brief Este módulo ordena un vector de ENTEROS de menor a menor utilizando un algoritmo basado en el método merge. 
  *  @pre La variable util_vector debe ser mayor a 0. 
  *  @param int vector[] (E/S) referencia a un vector de tipo entero al que se le va aplicar el algoritmo de ordenación, como este vector se va a modificar lo referenciamos SIN EL MODIFICADOR CONST. 
  *  @param int util_vector (E) variable que indica el numero de elementos que hay en el vector y la siguiente posición que hay disponible de escritura. Se realiza un paso por copia puesto que no se va a modificar el tamaño del vector. 
@@ -94,14 +196,19 @@ void mergesort( int vector[], int util_vector){
 }
 
 
-
+// Programa principal
 int main() {
+	// 1) Declaración del vector
 	const int DIM_VECTOR=10;
-	int vector[DIM_VECTOR]={4,9,2,1,3,5,3};
-	int util_vector=7;
+	int vector[DIM_VECTOR];
+	int util_vector=0;
 
+	// 2) Inicialización del vector
+	introduceVectorEnteros(vector, util_vector, DIM_VECTOR);
 	imprimeVectorEnteros(vector, util_vector);
 	cout << endl; 
+	
+	// 3) Invocación de función de ordenación
 	mergesort(vector, util_vector);
 	imprimeVectorEnteros(vector, util_vector);
 	cout << endl; 
